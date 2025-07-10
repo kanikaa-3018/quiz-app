@@ -10,10 +10,10 @@ const Profile = () => {
   const handlePreferenceChange = (e) => {
     const { name, value, type, checked } = e.target;
     
-    // For checkboxes, use the checked value, otherwise use the input value
+    // for checkboxes, use the checked value, otherwise use the input value
     const newValue = type === 'checkbox' ? checked : value;
     
-    // Update the user preferences
+    // update the user preferences
     updateUserData({
       preferences: {
         ...userData.preferences,
