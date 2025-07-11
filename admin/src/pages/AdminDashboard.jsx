@@ -86,7 +86,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm border-b border-gray-200">
+      {/* <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
@@ -108,12 +108,7 @@ export default function AdminDashboard() {
               >
                 Students Performance
               </Link>
-              {/* <Link
-                href="/student"
-                className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Student Portal
-              </Link> */}
+              
             </nav>
             <Link href="/admin/profile">
             <div className="flex items-center space-x-4">
@@ -125,7 +120,7 @@ export default function AdminDashboard() {
             
           </div>
         </div>
-      </header>
+      </header> */}
 
       <main className="mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col lg:flex-row gap-8">

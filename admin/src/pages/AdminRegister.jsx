@@ -13,8 +13,11 @@ const AdminRegister = () => {
     try {
       const res = await axios.post('http://localhost:3000/api/admin/register', formData);
       console.log(res.data);
+      
       localStorage.setItem('adminToken', res.data.token);
-      setLocation('/admin/dashboard');
+      //  const { token, admin } = res.data;
+      // signIn(admin, token);
+      setLocation('/admin/login');
     } catch (err) {
       console.log(err)
       alert(err.response?.data?.message || 'Registration failed');

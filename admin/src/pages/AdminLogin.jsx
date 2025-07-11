@@ -13,6 +13,8 @@ const AdminLogin = () => {
     try {
       const res = await axios.post('http://localhost:3000/api/admin/login', formData);
       localStorage.setItem('adminToken', res.data.token);
+      //  const { token, admin } = res.data;
+      // signIn(admin, token);
       setLocation('/admin/dashboard');
     } catch (err) {
       alert(err.response?.data?.message || 'Login failed');
