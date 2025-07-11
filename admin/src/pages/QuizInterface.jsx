@@ -25,6 +25,9 @@ export default function QuizInterface() {
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
+  const user = JSON.parse(localStorage.getItem("user")); 
+const studentId = user?._id;
+
   useEffect(() => {
     const stored = localStorage.getItem("currentQuiz");
     if (!stored) {
@@ -136,7 +139,7 @@ export default function QuizInterface() {
         : quizData.config.stream;
 
     const quizResult = {
-      student: "6863d216f0887ba0a0d71839",
+      student: studentId,
       questions: quizAnswers,
       score,
       timeTaken: timeSpent,

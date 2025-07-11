@@ -12,7 +12,7 @@ import { authenticate, isAdmin, isStudent } from '../middleware/auth.js';
 const router = express.Router();
 
 // Shared endpoints (accessible to both admin and students)
-router.get('/questions', getQuizQuestions);
+router.get('/', getQuizQuestions);
 router.get('/random', getRandomQuiz); // Public endpoint to allow guest quizzes
 
 // User panel specific endpoints

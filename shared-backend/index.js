@@ -11,6 +11,7 @@ import quizRoutes from "./routes/quizRoutes.js";
 import submissionRoutes from "./routes/submissionRoutes.js";
 import statsRoutes from "./routes/stats.js";
 import studentRoutes from "./routes/students.js";
+import adminRoutes from "./routes/adminAuth.js"
 
 dotenv.config();
 const app = express();
@@ -39,6 +40,7 @@ app.use("/api/quiz", quizRoutes);
 app.use("/api/submissions", submissionRoutes);
 app.use("/api/stats", statsRoutes);
 app.use("/api/students", studentRoutes);
+app.use("/api/admin", adminRoutes)
 
 // Global error handler
 app.use((err, req, res, next) => {

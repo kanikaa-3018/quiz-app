@@ -1,7 +1,8 @@
-import Question from '../models/Question.js';
-import Submission from '../models/Submission.js';
-import User from '../models/User.js';
+import Question from "../models/Question.js";
+import Submission from "../models/Submission.js";
+import User from "../models/User.js";
 import { generateMCQs } from "../utils/generateQuestion.js";
+import mongoose from "mongoose";
 
 // Get questions for quiz creation
 export const getQuizQuestions = async (req, res) => {
@@ -153,8 +154,8 @@ export const getRandomQuiz = async (req, res) => {
     // If authenticated user, track this quiz attempt
     if (req.user) {
       // Update user's last activity
-      await User.findByIdAndUpdate(req.user._id, { 
-        lastActive: new Date() 
+      await User.findByIdAndUpdate(req.user._id, {
+        lastActive: new Date(),
       });
     }
 
@@ -173,8 +174,9 @@ export const getRecentQuizAttempts = async (req, res) => {
     if (!req.user) {
       return res.status(401).json({ error: "Authentication required" });
     }
-    
-    const userId = req.user._id;
+
+    const userId = new mongoose.Types.ObjectId(req.user._id); // force convert
+    console.log("Using userId for query:", userId);
 
     const attempts = await Submission.find({ student: userId })
       .sort({ createdAt: -1 })
@@ -186,6 +188,8 @@ export const getRecentQuizAttempts = async (req, res) => {
       ...attempt,
       questionCount: attempt.questions?.length || 0,
     }));
+
+    console.log("Fetched attempts:", enrichedAttempts);
 
     res.json(enrichedAttempts);
   } catch (err) {
@@ -201,41 +205,41 @@ export const getAllQuizAttempts = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
-    
+
     // Filter parameters
     const { class: classFilter, subject, topic } = req.query;
-    
+
     // Build filter
     const filter = {};
     if (classFilter) filter.class = parseInt(classFilter);
     if (subject) filter.subject = subject;
     if (topic) filter.topic = topic;
-    
+
     // Count total matching documents for pagination
     const total = await Submission.countDocuments(filter);
-    
+
     // Get submissions with student details
     const attempts = await Submission.find(filter)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .populate('student', 'name email class stream')
-      .select('score timeTaken subject topic createdAt class questions student')
+      .populate("student", "name email class stream")
+      .select("score timeTaken subject topic createdAt class questions student")
       .lean();
-    
+
     const enrichedAttempts = attempts.map((attempt) => ({
       ...attempt,
       questionCount: attempt.questions?.length || 0,
     }));
-    
+
     res.json({
       attempts: enrichedAttempts,
       pagination: {
         total,
         page,
         limit,
-        pages: Math.ceil(total / limit)
-      }
+        pages: Math.ceil(total / limit),
+      },
     });
   } catch (err) {
     console.error("Error fetching all quiz attempts:", err);
@@ -247,73 +251,74 @@ export const getAllQuizAttempts = async (req, res) => {
 export const getUserPerformanceStats = async (req, res) => {
   try {
     const userId = req.params.userId || req.user._id;
-    
+
     if (!userId) {
       return res.status(400).json({ error: "User ID required" });
     }
+
     
-    // Find all submissions for this user
     const submissions = await Submission.find({ student: userId })
       .sort({ createdAt: -1 })
       .lean();
-    
+
+    console.log(submissions)
+
     if (!submissions.length) {
       return res.json({
         quizzesTaken: 0,
         averageScore: 0,
         subjectPerformance: {},
-        recentScores: []
+        recentScores: [],
       });
     }
-    
+
     // Calculate overall stats
     const quizzesTaken = submissions.length;
     const totalScore = submissions.reduce((sum, sub) => sum + sub.score, 0);
     const averageScore = Math.round(totalScore / quizzesTaken);
-    
+
     // Calculate per-subject performance
     const subjectPerformance = {};
-    submissions.forEach(sub => {
+    submissions.forEach((sub) => {
       if (!subjectPerformance[sub.subject]) {
         subjectPerformance[sub.subject] = {
           attempts: 0,
           totalScore: 0,
-          averageScore: 0
+          averageScore: 0,
         };
       }
-      
+
       subjectPerformance[sub.subject].attempts += 1;
       subjectPerformance[sub.subject].totalScore += sub.score;
       subjectPerformance[sub.subject].averageScore = Math.round(
-        subjectPerformance[sub.subject].totalScore / subjectPerformance[sub.subject].attempts
+        subjectPerformance[sub.subject].totalScore /
+          subjectPerformance[sub.subject].attempts
       );
     });
-    
+
     // Get recent scores for charting
-    const recentScores = submissions
-      .slice(0, 10)
-      .map(sub => ({
-        date: sub.createdAt,
-        score: sub.score,
-        subject: sub.subject,
-        topic: sub.topic
-      }));
-    
+    const recentScores = submissions.slice(0, 10).map((sub) => ({
+      date: sub.createdAt,
+      score: sub.score,
+      subject: sub.subject,
+      topic: sub.topic,
+    }));
+
     // Update user stats
     await User.findByIdAndUpdate(userId, {
       stats: {
         quizzesTaken,
         totalScore,
         averageScore,
-        topicsCompleted: Object.keys(subjectPerformance).length
-      }
+        topicsCompleted: Object.keys(subjectPerformance).length,
+      },
     });
-    
+
     res.json({
       quizzesTaken,
       averageScore,
       subjectPerformance,
-      recentScores
+      recentScores,
     });
   } catch (err) {
     console.error("Error fetching performance stats:", err);
@@ -327,41 +332,41 @@ export const getRecommendedQuizzes = async (req, res) => {
     if (!req.user) {
       return res.status(401).json({ error: "Authentication required" });
     }
-    
+
     const userId = req.user._id;
     const user = await User.findById(userId).lean();
-    
+
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-    
+
     // Get user's recent submissions
     const recentSubmissions = await Submission.find({ student: userId })
       .sort({ createdAt: -1 })
       .limit(10)
       .lean();
-    
+
     // Create recommendations based on:
     // 1. Poor performance areas (score < 60%)
     // 2. User's class level
     // 3. User's stream (if applicable)
-    
+
     const weakSubjects = new Set();
     const practicedTopics = new Set();
-    
-    recentSubmissions.forEach(sub => {
+
+    recentSubmissions.forEach((sub) => {
       if (sub.score < 60) {
         weakSubjects.add(sub.subject);
       }
-      
+
       if (sub.topic) {
         practicedTopics.add(`${sub.subject}-${sub.topic}`);
       }
     });
-    
+
     // Build recommendations
     const recommendations = [];
-    
+
     // 1. Recommend quizzes for weak subjects
     if (weakSubjects.size > 0) {
       for (const subject of weakSubjects) {
@@ -369,47 +374,49 @@ export const getRecommendedQuizzes = async (req, res) => {
           type: "improvement",
           subject,
           topic: "",
-          description: `Practice ${subject} to improve your score`
+          description: `Practice ${subject} to improve your score`,
         });
       }
     }
-    
+
     // 2. Find topics in user's class that haven't been practiced
     const availableTopics = await Question.aggregate([
       {
-        $match: { 
+        $match: {
           class: user.class,
-          ...(user.stream && user.stream !== "None" && user.class >= 11 ? { stream: user.stream } : {})
-        }
+          ...(user.stream && user.stream !== "None" && user.class >= 11
+            ? { stream: user.stream }
+            : {}),
+        },
       },
       {
-        $group: { 
-          _id: { subject: "$subject", topic: "$topic" }
-        }
-      }
+        $group: {
+          _id: { subject: "$subject", topic: "$topic" },
+        },
+      },
     ]);
-    
+
     for (const topicGroup of availableTopics) {
       const subject = topicGroup._id.subject;
       const topic = topicGroup._id.topic;
-      
+
       if (topic && !practicedTopics.has(`${subject}-${topic}`)) {
         recommendations.push({
           type: "new",
           subject,
           topic,
-          description: `Try a quiz on ${subject}: ${topic}`
+          description: `Try a quiz on ${subject}: ${topic}`,
         });
-        
+
         // Limit to 3 new topic recommendations
-        if (recommendations.filter(r => r.type === "new").length >= 3) {
+        if (recommendations.filter((r) => r.type === "new").length >= 3) {
           break;
         }
       }
     }
-    
+
     res.json({
-      recommendations: recommendations.slice(0, 5)  // Return top 5 recommendations
+      recommendations: recommendations.slice(0, 5), // Return top 5 recommendations
     });
   } catch (err) {
     console.error("Error generating recommendations:", err);

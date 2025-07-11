@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'wouter';
 import { useUser } from '../context/UserContext';
 
 const SignIn = () => {
@@ -11,7 +11,7 @@ const SignIn = () => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const { signIn } = useUser();
-  const navigate = useNavigate();
+  const [, navigate] = useLocation();
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -19,7 +19,6 @@ const SignIn = () => {
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }));
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: '' }));
     }
@@ -67,14 +66,14 @@ const SignIn = () => {
             <h1 className="text-3xl font-bold text-gray-900">Welcome back!</h1>
             <p className="mt-2 text-gray-600">Please sign in to your account</p>
           </div>
-          
+
           <form className="space-y-6" onSubmit={handleSubmit}>
             {errors.form && (
               <div className="bg-red-50 p-3 rounded text-red-700 text-sm mb-4">
                 {errors.form}
               </div>
             )}
-            
+
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                 Email Address
@@ -158,6 +157,7 @@ const SignIn = () => {
             </div>
 
             <div className="mt-6 grid grid-cols-2 gap-3">
+              {/* Google Button */}
               <button
                 type="button"
                 className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
@@ -168,6 +168,7 @@ const SignIn = () => {
                 <span className="ml-2">Google</span>
               </button>
 
+              {/* GitHub Button */}
               <button
                 type="button"
                 className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
@@ -183,14 +184,14 @@ const SignIn = () => {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Don't have an account?{' '}
-              <Link to="/signup" className="font-medium text-blue-600 hover:text-blue-500">
+              <Link href="/signup" className="font-medium text-blue-600 hover:text-blue-500">
                 Sign up
               </Link>
             </p>
           </div>
         </div>
       </div>
-      
+
       {/* Right side - Image and text */}
       <div className="hidden lg:block lg:w-1/2 bg-blue-600">
         <div className="flex flex-col justify-center h-full p-12 text-white">
@@ -200,7 +201,7 @@ const SignIn = () => {
             Access thousands of practice questions, track your progress, and improve your understanding
             in subjects like Physics, Chemistry, and Mathematics.
           </p>
-          
+
           <div className="bg-blue-500 rounded-lg p-4 mb-4">
             <blockquote>
               <p className="italic">"Tinker Tutor helped me prepare efficiently for my board exams. The personalized reports and targeted practice made all the difference!"</p>

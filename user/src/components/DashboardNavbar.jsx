@@ -1,60 +1,58 @@
 import { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'wouter';
 import { useUser } from '../context/UserContext';
 
 const DashboardNavbar = () => {
   const { userData, signOut } = useUser();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const [location, setLocation] = useLocation(); // `setLocation` replaces `useNavigate`
   const [showDropdown, setShowDropdown] = useState(false);
   
   const isActive = (path) => {
-    return location.pathname === path ? 'bg-blue-600 text-white' : 'text-gray-800 hover:bg-blue-50';
+    return location === path ? 'bg-blue-600 text-white' : 'text-gray-800 hover:bg-blue-50';
   };
 
   const handleSignOut = () => {
     signOut();
     setShowDropdown(false);
-    navigate('/');
+    setLocation('/'); // navigate to home
   };
 
   const toggleDropdown = () => {
     setShowDropdown(!showDropdown);
   };
 
-  // Function to get initials from name
   const getInitials = () => {
     if (!userData) return "?";
-    return `${userData.firstName.charAt(0)}${userData.lastName.charAt(0)}`;
+    return `${userData?.firstName?.charAt(0)}${userData?.lastName?.charAt(0)}`;
   };
 
   return (
     <nav className="flex items-center justify-between py-4 px-8 bg-white shadow-sm">
       <div className="flex items-center">
-        <Link to="/" className="text-2xl font-bold text-blue-500 mr-8 transition-transform hover:scale-105 duration-300">
+        <Link href="/" className="text-2xl font-bold text-blue-500 mr-8 transition-transform hover:scale-105 duration-300">
           Tinker Tutor
         </Link>
         <div className="flex space-x-2">
           <Link 
-            to="/dashboard" 
+            href="/dashboard" 
             className={`px-4 py-2 rounded-md font-medium transition-all duration-300 hover:-translate-y-1 ${isActive('/dashboard')}`}
           >
             Dashboard
           </Link>
           <Link 
-            to="/take-quiz" 
+            href="/take-quiz" 
             className={`px-4 py-2 rounded-md font-medium transition-all duration-300 hover:-translate-y-1 ${isActive('/take-quiz')}`}
           >
             Take Quiz
           </Link>
           <Link 
-            to="/reports" 
+            href="/reports" 
             className={`px-4 py-2 rounded-md font-medium transition-all duration-300 hover:-translate-y-1 ${isActive('/reports')}`}
           >
             Reports
           </Link>
           <Link 
-            to="/profile" 
+            href="/profile" 
             className={`px-4 py-2 rounded-md font-medium transition-all duration-300 hover:-translate-y-1 ${isActive('/profile')}`}
           >
             Profile
@@ -75,7 +73,7 @@ const DashboardNavbar = () => {
           >
             {userData?.profilePicture ? (
               <img 
-                src={userData.profilePicture} 
+                src={userData?.profilePicture} 
                 alt="Profile" 
                 className="w-8 h-8 rounded-full object-cover"
               />
@@ -89,7 +87,7 @@ const DashboardNavbar = () => {
           {showDropdown && (
             <div className="absolute right-0 mt-2 w-48 py-2 bg-white rounded-md shadow-lg z-20">
               <Link 
-                to="/profile" 
+                href="/profile" 
                 className="block px-4 py-2 text-gray-800 hover:bg-blue-50"
                 onClick={() => setShowDropdown(false)}
               >

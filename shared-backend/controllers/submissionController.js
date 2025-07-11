@@ -124,12 +124,10 @@ export const submitQuiz = async (req, res) => {
   }
 };
 
-// Get all submissions for a specific user
 export const getUserSubmissions = async (req, res) => {
   try {
     const { userId } = req.params;
     
-    // Check if requesting user has permission (admin or the user themselves)
     if (req.user && (req.user.role === 'admin' || req.user._id.toString() === userId)) {
       const submissions = await Submission.find({ student: userId })
         .sort({ createdAt: -1 })
@@ -156,6 +154,7 @@ export const getUserSubmissions = async (req, res) => {
 export const getSubmissionAnswers = async (req, res) => {
   try {
     const { id } = req.params;
+    console.log(id)
 
     const submission = await Submission.findById(id)
       .populate('questions.questionId')

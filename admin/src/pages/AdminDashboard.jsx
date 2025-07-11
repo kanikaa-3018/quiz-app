@@ -97,7 +97,7 @@ export default function AdminDashboard() {
             </div>
             <nav className="hidden md:flex space-x-8">
               <Link
-                href="/admin"
+                href="/admin/dashboard"
                 className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
               >
                 Admin Dashboard
@@ -108,19 +108,21 @@ export default function AdminDashboard() {
               >
                 Students Performance
               </Link>
-              <Link
+              {/* <Link
                 href="/student"
                 className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
               >
                 Student Portal
-              </Link>
+              </Link> */}
             </nav>
+            <Link href="/admin/profile">
             <div className="flex items-center space-x-4">
               <Button className="btn-primary">
                 <Users className="w-4 h-4 mr-2" />
                 Profile
               </Button>
-            </div>
+            </div></Link>
+            
           </div>
         </div>
       </header>

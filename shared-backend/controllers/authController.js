@@ -5,19 +5,21 @@ import Submission from '../models/Submission.js';
 
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, password, role, class: userClass, stream } = req.body;
+    const { name, email, password, role, class: userClass, stream } = req.body; // ✅ include role
+    console.log("Received:", req.body);
+
     const existing = await User.findOne({ email });
     if (existing) return res.status(400).json({ message: 'User already exists' });
 
     const hashed = await bcrypt.hash(password, 10);
+
     const newUser = await User.create({ 
       name, 
       email, 
       password: hashed, 
-      role, 
+      role, // ✅ include role
       class: userClass, 
       stream,
-      // Initialize with default values
       profilePicture: '',
       bio: '',
       preferences: {
@@ -32,14 +34,12 @@ export const registerUser = async (req, res) => {
         topicsCompleted: 0
       }
     });
-    
-    // Create token for immediate login
+
     const token = jwt.sign({ id: newUser._id, role: newUser.role }, process.env.JWT_SECRET, { expiresIn: '2d' });
-    
-    // Don't return password in response
+
     const userToReturn = newUser.toObject();
     delete userToReturn.password;
-    
+
     res.status(201).json({ 
       message: 'Registered successfully', 
       token, 
@@ -50,6 +50,7 @@ export const registerUser = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
 
 export const loginUser = async (req, res) => {
   try {
@@ -171,3 +172,5 @@ export const changePassword = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+

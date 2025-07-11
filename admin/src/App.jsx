@@ -12,15 +12,22 @@ import QuizInterface from "@/pages/QuizInterface";
 import QuizResults from "@/pages/QuizResults";
 import NotFound from "@/pages/NotFound";
 import StudentPerformancePanel from "./components/StudentPerformancePanel";
+import AdminLogin from './pages/AdminLogin';
+import AdminRegister from './pages/AdminRegister';
+import LandingPage from "./pages/LandingPage";
+import AdminProfile from "./pages/AdminProfile";
 
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={AdminDashboard} />
-      <Route path="/admin" component={AdminDashboard} />
-      <Route path="/student" component={StudentPortal} />
+      <Route path="/" component={LandingPage} />
+      <Route path="/admin/login" component={AdminLogin} />
+      <Route path="/admin/register" component={AdminRegister} />
+      <Route path="/admin/dashboard" component={AdminDashboard} />
+      <Route path="/admin/profile" component={AdminProfile}/>
+      {/* <Route path="/student" component={StudentPortal} />
       <Route path="/quiz" component={QuizInterface} />
-      <Route path="/results" component={QuizResults} />
+      <Route path="/results" component={QuizResults} /> */}
       <Route path="/student-stats" component={StudentPerformancePanel} />
 
       <Route component={NotFound} />

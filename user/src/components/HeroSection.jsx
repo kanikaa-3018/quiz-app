@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link } from 'wouter';
 import FeatureCard from './FeatureCard';
 
 const HeroSection = () => {
@@ -33,7 +33,7 @@ const HeroSection = () => {
           Unlock your academic potential with personalized learning experiences designed for students from Classes 5-12. Get expert guidance, track your progress, and excel in your studies.
         </p>
         <Link 
-          to="/dashboard" 
+          href="/dashboard" 
           className="inline-block px-8 py-3 bg-white text-blue-600 font-medium rounded-md hover:bg-blue-50 transition-all duration-300 transform hover:scale-105 hover:shadow-lg animate-bounce-subtle"
         >
           Start Learning
