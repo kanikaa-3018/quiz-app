@@ -13,7 +13,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 connectDB();
 const corsOptions = {
-  origin: "http://localhost:5173", // Change to your frontend origin
+  origin: "https://localhost:5173", 
   credentials: true,
 };
 
@@ -24,7 +24,7 @@ app.use("/contact", contactRoutes);
 app.post("/create-checkout-session", async (req, res) => {
   try {
     const { item } = req.body;
-    const origin = req.headers.origin || "http://localhost:5173";
+    const origin = req.headers.origin || "https://localhost:5173";
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -56,7 +56,7 @@ app.post("/create-checkout-session", async (req, res) => {
 app.post("/create-course-checkout-session", async (req, res) => {
   try {
     const { item, type } = req.body;
-    const origin = req.headers.origin || "http://localhost:5173"; // type can be 'iot', 'ml', etc.
+    const origin = req.headers.origin || "https://localhost:5173"; 
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
